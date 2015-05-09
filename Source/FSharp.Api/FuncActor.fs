@@ -89,7 +89,7 @@ type FuncActorBootstrap() =
       let expr = binary.UnPickle<Quotations.Expr<ActorConfig>>(bytes)
       expr.Compile()
 
-   override this.Run(system, properties : IDictionary<string, string>) =      
+   override this.Run(properties:IDictionary<string,string>) =           
       properties |> Seq.filter(fun p -> p.Key <> "<-::Type::->")
                  |> Seq.iter (fun p -> actorConfigs.Add(p.Key, compileExpr(p.Value)))
       TaskDone.Done
@@ -113,26 +113,26 @@ let rec private fillActorConfig configExpr =
    | _ -> failwith "Can't parse ActorConfig expression."
 
 
-let registerFuncActors (configsExpr : Expr<ActorConfig list>) (silo : EmbeddedConfigurator) =             
-   
-   let rec loop(expr : Expr, map : Map<string, string>) =
-      match expr with
-      | NewUnionCase (_, h::t) -> 
-         let newMap = h |> fillActorConfig |> serializeConfig |> map.Add
-         loop(t.Head, newMap)
-      | _ -> map
+type EmbeddedConfigurator with
+   member this.RegisterFuncActors(configsExpr:Expr<ActorConfig list>) =
+      let rec loop(expr:Expr, map:Map<string,string>) =
+         match expr with
+         | NewUnionCase (_, h::t) -> 
+            let newMap = h |> fillActorConfig |> serializeConfig |> map.Add
+            loop(t.Head, newMap)
+         | _ -> map
 
-   let configs = loop(configsExpr, Map.empty)
-   let dict = Dictionary(configs)
-   
-   silo |> System.register [|Assembly.GetExecutingAssembly()|]
-        |> System.run<FuncActorBootstrap> dict
+      let configs = loop(configsExpr, Map.empty)
+      let dict = Dictionary(configs)
 
+      this.Register([|Assembly.GetExecutingAssembly()|])
+          .Run<FuncActorBootstrap>(dict) 
 
+       
 type ActorRef<'TMessage>(ref) =
    member this.Ref = ref
 
-let spawn (system : IActorSystem) (config : ActorConfig<'TMessage>) id =   
+let spawn (system:IActorSystem) (config:ActorConfig<'TMessage>) id =
    let actorRef = system.ActorOf(ActorPath.From(typedefof<FuncActor>, config.Name + ":" + id))
    ActorRef<'TMessage>(actorRef)
 

@@ -1,6 +1,7 @@
 ﻿open System
 
 open Orleankka
+open Orleankka.Playground
 open Orleankka.FSharp
 open Orleankka.FSharp.FuncActor
 
@@ -12,9 +13,10 @@ let main argv =
 
    printfn "Running demo. Booting cluster might take some time ...\n"
    
-   use system = playgroundActorSystem()
-                |> registerFuncActors <@[ShopActor; AccountActor]@>
-                |> start
+   use system = ActorSystem.Configure()
+                           .Playground()
+                           .RegisterFuncActors(<@[ShopActor; AccountActor]@>)
+                           .Done()
 
    let shop = spawn system ShopActor "Amazon"
    let account = spawn system AccountActor "Antya"
