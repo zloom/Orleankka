@@ -8,39 +8,57 @@ namespace Orleankka.Playground
     using Client;
     using Cluster;
     using Embedded;
+    using Utility;
 
     public sealed class PlaygroundConfigurator : EmbeddedConfigurator
     {
-        internal PlaygroundConfigurator(IActorSystemConfigurator configurator, AppDomainSetup setup)
-            : base(configurator, null)
-        {}
+        readonly ClusterConfiguration cluster;
+        readonly ClientConfiguration client;
 
-        internal PlaygroundConfigurator Configure()
+        internal PlaygroundConfigurator(AppDomainSetup setup)
+            : base(setup)
         {
-            var cluster = new ClusterConfiguration()
-                .LoadFromEmbeddedResource<PlaygroundConfigurator>("Cluster.xml");
-
-            var client = new ClientConfiguration()
+            client = new ClientConfiguration()
                 .LoadFromEmbeddedResource<PlaygroundConfigurator>("Client.xml");
 
-            From(client);
-            From(cluster);
+            cluster = new ClusterConfiguration()
+                .LoadFromEmbeddedResource<PlaygroundConfigurator>("Cluster.xml");
 
             cluster.Globals.LivenessType =
                 GlobalConfiguration.LivenessProviderType.MembershipTableGrain;
 
             cluster.Globals.ReminderServiceType =
-                GlobalConfiguration.ReminderServiceProviderType.ReminderTableGrain;
+                GlobalConfiguration.ReminderServiceProviderType.ReminderTableGrain;   
+        }
 
+        public PlaygroundConfigurator Tweak(Action<ClientConfiguration> tweak)
+        {
+            Requires.NotNull(tweak, "tweak");
+            tweak(client);
             return this;
+        }
+
+        public PlaygroundConfigurator Tweak(Action<ClusterConfiguration> tweak)
+        {
+            Requires.NotNull(tweak, "tweak");
+            tweak(cluster);
+            return this;
+        }
+
+        public override IActorSystem Done()
+        {
+            From(client);
+            From(cluster);
+
+            return base.Done();
         }
     }
 
     public static class PlaygroundConfiguratorExtensions
     {
-        public static PlaygroundConfigurator Playground(this ActorSystemConfigurator configurator, AppDomainSetup setup = null)
+        public static PlaygroundConfigurator Playground(this IActorSystemConfigurator root, AppDomainSetup setup = null)
         {
-            return new PlaygroundConfigurator(configurator, setup).Configure();
+            return new PlaygroundConfigurator(setup);
         }
     }
 }

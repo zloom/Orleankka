@@ -12,6 +12,8 @@ using Orleans.Runtime;
 
 namespace Orleankka.Core
 {
+    using Cluster;
+
     /// <summary> 
     /// FOR INTERNAL USE ONLY!
     /// </summary>
@@ -41,13 +43,15 @@ namespace Orleankka.Core
                 await Activate(ActorPath.Deserialize(envelope.Target));
 
             Debug.Assert(actor != null);
+            KeepAlive();
+
             return new ResponseEnvelope(await actor.OnReceive(envelope.Message));
         }
 
         public Task<ResponseEnvelope> ReceiveReentrant(RequestEnvelope envelope)
         {
             #if DEBUG
-                CallContext.LogicalSetData("ReceiveReentrant", envelope.Message);
+                CallContext.LogicalSetData("LastMessageReceivedReentrant", envelope.Message);
             #endif
 
             return Receive(envelope);
@@ -59,17 +63,32 @@ namespace Orleankka.Core
                 await Activate(ActorPath.Deserialize(IdentityOf(this)));
 
             Debug.Assert(actor != null);
+            KeepAlive();
+
             await actor.OnReminder(reminderName);
         }
 
         async Task Activate(ActorPath path)
         {
-            var system = ActorSystem.Instance;
+            var system = ClusterActorSystem.Current;
 
             actor = Activator.Activate(path.Type);
             actor.Initialize(path.Id, system, this, ActorPrototype.Of(path.Type));
             
             await actor.OnActivate();
+        }
+
+        public override Task OnDeactivateAsync()
+        {
+            if (actor != null)
+                actor.OnDeactivate();
+
+            return TaskDone.Done;
+        }
+
+        void KeepAlive()
+        {
+            actor.Prototype.KeepAlive(this);
         }
 
         #region Internals
@@ -113,9 +132,7 @@ namespace Orleankka.Core
 
         static string IdentityOf(IGrain grain)
         {
-            string identity;
-            grain.GetPrimaryKeyLong(out identity);
-            return identity;
+            return (grain as IGrainWithStringKey).GetPrimaryKeyString();
         }
 
         internal static IActorEndpoint Proxy(ActorPath path)

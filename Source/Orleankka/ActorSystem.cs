@@ -19,24 +19,23 @@ namespace Orleankka
     /// <summary>
     /// Runtime implementation of <see cref="IActorSystem"/>
     /// </summary>
-    public abstract class ActorSystem : IActorSystem
+    public abstract class ActorSystem : MarshalByRefObject, IActorSystem
     {
-        internal static IActorSystem Instance;
-
-        internal static void Reset()
+        public static IActorSystemConfigurator Configure()
         {
-            Instance = null;
-        }
-
-        public static ActorSystemConfigurator Configure()
-        {
-            return new ActorSystemConfigurator();
+            return null;
         }
 
         protected ActorSystem()
         {}
 
-        public abstract ActorRef ActorOf(ActorPath path);
+        public ActorRef ActorOf(ActorPath path)
+        {
+            if (path == ActorPath.Empty)
+                throw new ArgumentException("ActorPath is empty", "path");
+
+           return ActorRef.Deserialize(path);
+        }
 
         public abstract void Dispose();
     }

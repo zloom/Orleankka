@@ -7,31 +7,47 @@ using Orleans.Runtime.Configuration;
 
 namespace Orleankka.Cluster
 {
-    class ClusterActorSystem : MarshalByRefObject, IActorSystem
+    public class ClusterActorSystem : ActorSystem
     {
+        static IActorSystem current;
+
+        public static IActorSystem Current 
+        {
+            get
+            {
+                if (current == null)
+                    throw new InvalidOperationException("Cluster actor system hasn't been initialized");
+
+                return current;
+            }
+
+            internal set
+            {
+                if (current != null)
+                    throw new InvalidOperationException("Cluster actor system has been already initialized");
+
+                current = value;
+            }
+        }
+
         readonly IDisposable configurator;
         SiloHost host;
 
-        internal ClusterActorSystem(AppDomain domain, IDisposable configurator, ClusterConfiguration configuration)
+        internal ClusterActorSystem(IDisposable configurator, ClusterConfiguration configuration)
         {
+            Current = this;
             this.configurator = configurator;
             host = new SiloHost(Dns.GetHostName(), configuration);
-            domain.SetData("ActorSystem.Current", this);
         }
 
-        ActorRef IActorSystem.ActorOf(ActorPath path)
-        {
-            return ActorRef.Resolve(path);
-        }
-
-        public void Start()
+        internal void Start()
         {
             host.LoadOrleansConfig();
             host.InitializeOrleansSilo();
             host.StartOrleansSilo();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (host == null)
                 return;

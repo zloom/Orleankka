@@ -27,17 +27,21 @@ namespace Orleankka
         }
 
         readonly ClientEndpoint endpoint;
-        readonly ObserverRef @ref;
 
         protected Observer(ObserverRef @ref)
         {
-            this.@ref = @ref;
+            Ref = @ref;
         }
 
         Observer(ClientEndpoint endpoint) 
             : this(endpoint.Self)
         {
             this.endpoint = endpoint;
+        }
+
+        public ObserverRef Ref
+        {
+            get; private set;
         }
 
         public virtual void Dispose()
@@ -52,7 +56,7 @@ namespace Orleankka
 
         public static implicit operator ObserverRef(Observer arg)
         {
-            return arg.@ref;
+            return arg.Ref;
         }
     }
 
@@ -72,6 +76,13 @@ namespace Orleankka
             Requires.NotNull(callback, "callback");
 
             return client.Subscribe(new DelegateObserver(callback));
+        }
+
+        public static IDisposable Subscribe<T>(this Observer client, Action<T> callback)
+        {
+            Requires.NotNull(callback, "callback");
+
+            return client.Subscribe(new DelegateObserver(x => callback((T)x)));
         }
 
         class DelegateObserver : IObserver<object>

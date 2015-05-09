@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Orleankka;
+using Orleankka.Meta;
 using Orleankka.Services;
 
 namespace Demo
@@ -55,7 +56,7 @@ namespace Demo
             this.storage = storage;
         }
 
-        public override async Task OnActivate()
+        protected override async Task OnActivate()
         {
             total = await storage.ReadTotalAsync(Id);
         }
@@ -68,7 +69,7 @@ namespace Demo
                 await reminders.Register(entry.Key.Path.Id, TimeSpan.Zero, entry.Value);
         }
 
-        public override async Task OnReminder(string api)
+        protected override async Task OnReminder(string api)
         {
             try
             {
@@ -134,7 +135,7 @@ namespace Demo
         {
             var provider = System.ActorOf<Api>(api);
 
-            total += await provider.Query(new Search(query));
+            total += await provider.Ask(new Search(query));
             Log.Message(ConsoleColor.DarkGray, "[{0}] succesfully obtained results from {1} ...", Id, api);
 
             await storage.WriteTotalAsync(Id, total);

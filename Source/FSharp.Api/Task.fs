@@ -6,24 +6,8 @@ open System
 open System.Threading
 open System.Threading.Tasks
 
-type Result<'T> = 
-   | Canceled   
-   | Error of exn    
-   | Successful of 'T
 
 let inline wait (task : Task<_>) = task.Wait()
-
-let run (t: unit -> Task<_>) = 
-   try
-      let task = t()
-      task.Result |> Result.Successful
-   with 
-   | :? OperationCanceledException -> Result.Canceled
-   | :? AggregateException as e ->
-      match e.InnerException with
-      | :? TaskCanceledException -> Result.Canceled
-      | _ -> Result.Error e
-   | e -> Result.Error e
 
 let toAsync (t: Task<'T>): Async<'T> =
    let abegin (cb: AsyncCallback, state: obj) : IAsyncResult = 
@@ -114,6 +98,13 @@ type TaskBuilder(?continuationOptions, ?scheduler, ?cancellationToken) =
    member this.While(guard, m) =
       if not(guard()) then this.Zero() else
             this.Bind(m(), fun () -> this.While(guard, m))
+
+   member this.TryWith(t:unit -> Task<_>, catchFn:exn -> Task<_>) =
+      t().ContinueWith(fun (t:Task<_>) -> 
+            match t.IsFaulted with
+            | false -> returnM(t.Result)
+            | true  -> catchFn(t.Exception))
+         .Unwrap()
 
    member this.TryFinally(m, compensation) =
       try this.ReturnFrom m

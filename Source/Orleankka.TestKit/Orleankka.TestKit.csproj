@@ -43,8 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Orleans">
-      <HintPath>..\..\Binaries\Orleans\lib\net45\Orleans.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.Orleans.Core.1.0.5\lib\net45\Orleans.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -56,7 +55,9 @@
       <Link>Properties\Product.cs</Link>
     </Compile>
     <Compile Include="ActivationServiceMock.cs" />
+    <Compile Include="ActorExtensions.cs" />
     <Compile Include="ActorRefMock.cs" />
+    <Compile Include="Meta.cs" />
     <Compile Include="ObserverRefStub.cs" />
     <Compile Include="ActorRefStub.cs" />
     <Compile Include="Expectations.cs" />
@@ -80,6 +81,9 @@
       <Project>{944568ea-bc0b-49bc-af0f-b4a4a62858ac}</Project>
       <Name>Orleankka</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
