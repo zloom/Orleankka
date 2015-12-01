@@ -128,6 +128,7 @@
     <Compile Include="Checks\StreamRefFixture.cs" />
     <Compile Include="Checks\StreamPathFixture.cs" />
     <Compile Include="Features\Declarative_stream_subscriptions.cs" />
+    <Compile Include="Features\Separated_interface.cs" />
     <Compile Include="Features\Strongly_typed_actors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Checks\ActorPathFixture.cs" />
@@ -175,6 +176,14 @@
     <ProjectReference Include="..\Orleankka.Meta\Orleankka.Meta.csproj">
       <Project>{1220A904-CAFA-4F1C-BBCB-82B9257C9FC5}</Project>
       <Name>Orleankka.Meta</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orleankka.Tests.Implementations\Orleankka.Tests.Implementations.csproj">
+      <Project>{38534b6b-0ff8-403d-bd32-9be55f76aaa3}</Project>
+      <Name>Orleankka.Tests.Implementations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orleankka.Tests.Interfaces\Orleankka.Tests.Interfaces.csproj">
+      <Project>{1f6799dc-16b3-4cdf-8c1a-9e25eae2388c}</Project>
+      <Name>Orleankka.Tests.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Orleankka\Orleankka.csproj">
       <Project>{944568ea-bc0b-49bc-af0f-b4a4a62858ac}</Project>

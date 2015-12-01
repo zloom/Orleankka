@@ -102,6 +102,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleankka.TestKit.Meta", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Internals", "Source\Orleans.Internals\Orleans.Internals.csproj", "{97E4FE27-27FD-499B-8737-0F293807C297}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleankka.Tests.Interfaces", "Source\Orleankka.Tests.Interfaces\Orleankka.Tests.Interfaces.csproj", "{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleankka.Tests.Implementations", "Source\Orleankka.Tests.Implementations\Orleankka.Tests.Implementations.csproj", "{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -307,6 +311,18 @@ Global
 		{97E4FE27-27FD-499B-8737-0F293807C297}.Package|Any CPU.Build.0 = Release|Any CPU
 		{97E4FE27-27FD-499B-8737-0F293807C297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97E4FE27-27FD-499B-8737-0F293807C297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Package|Any CPU.Build.0 = Release|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6799DC-16B3-4CDF-8C1A-9E25EAE2388C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Package|Any CPU.Build.0 = Release|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38534B6B-0FF8-403D-BD32-9BE55F76AAA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

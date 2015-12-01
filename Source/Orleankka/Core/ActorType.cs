@@ -18,20 +18,32 @@ namespace Orleankka.Core
 
         public static void Register(IEnumerable<Assembly> assemblies)
         {
-            foreach (var assembly in assemblies)
-                Register(assembly);
+            Register(assemblies.SelectMany(x => x.GetTypes()).ToArray());
         }
 
-        static void Register(Assembly assembly)
+        static void Register(Type[] types)
         {
-            var actors = assembly
-                .GetTypes()
-                .Where(x =>
-                       !x.IsAbstract
-                       && typeof(Actor).IsAssignableFrom(x));
+            var implementations = Implementations(types);
+            var interfaces = Separated(Interfaces(types), implementations);
 
-            foreach (var actor in actors)
-                Register(actor);
+            Array.ForEach(interfaces, Register);
+            Array.ForEach(implementations, Register);
+        }
+
+        static Type[] Interfaces(IEnumerable<Type> types)
+        {
+            return types.Where(x => x.IsInterface && typeof(IActor).IsAssignableFrom(x)).ToArray();
+        }
+
+        static Type[] Implementations(IEnumerable<Type> types)
+        {
+            return types.Where(x => x.IsClass && !x.IsAbstract && typeof(Actor).IsAssignableFrom(x)).ToArray();
+        }
+
+        static Type[] Separated(IEnumerable<Type> interfaces, IEnumerable<Type> implementations)
+        {
+            var implemented = new HashSet<Type>(implementations.SelectMany(x => x.GetInterfaces()));
+            return interfaces.SkipWhile(i => implemented.Contains(i)).ToArray();
         }
 
         static void Register(Type actor)
@@ -117,16 +129,37 @@ namespace Orleankka.Core
 
         public static ActorType From(Type type)
         {
+            // figure out whether you deal with interface or concrete actor type
+            // and get attributes accordingly, either from type or from it's interface
+            // if it has separated interface of course; otherwise type <==> interface
+
+            var @interface = InterfaceOf(type);
+            var @implementation = ImplementationOf(type);
+            var code = GetTypeCode(@interface);
+
+            return new ActorType(code, @interface, @implementation);
+        }
+
+        static Type InterfaceOf(Type type)
+        {
+            return type;
+        }
+
+        static Type ImplementationOf(Type type)
+        {
+            return type;
+        }
+
+        static string GetTypeCode(Type type)
+        {
             var customAttribute = type
                 .GetCustomAttributes(typeof(ActorTypeCodeAttribute), false)
                 .Cast<ActorTypeCodeAttribute>()
                 .SingleOrDefault();
 
-            var code = customAttribute != null
-                        ? customAttribute.Code
-                        : type.FullName;
-
-            return new ActorType(code, type, type);
+            return customAttribute != null
+                    ? customAttribute.Code
+                    : type.FullName;
         }
 
         public bool Equals(ActorType other)

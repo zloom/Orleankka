@@ -49,7 +49,9 @@ namespace Orleankka.Testing
                 .UseInMemoryPubSubStore()
                 .TweakCluster(cfg => cfg
                     .DefaultKeepAliveTimeout(TimeSpan.FromMinutes(DefaultKeepAliveTimeoutInMinutes)))
-                .Register(GetType().Assembly);
+                .Register(GetType().Assembly)
+                .Register(typeof(ITestSeparatedInterfaceActor).Assembly)
+                .Register(typeof(TestSeparatedInterfaceActor).Assembly);
 
             if (EnableAzureQueueStreamProvider)
             {
