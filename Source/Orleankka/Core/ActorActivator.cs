@@ -41,7 +41,7 @@ namespace Orleankka.Core
         }
     }
 
-    static class ActorActivatorExntensions
+    static class ActorActivatorExtensions
     {
         public static Actor Activate(this IActorActivator activator, ActorPath path, IActorRuntime runtime)
         {

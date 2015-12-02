@@ -11,7 +11,7 @@ namespace Orleankka.Core.Streams
     {
         internal static IEnumerable<StreamSubscriptionSpecification> From(ActorType type)
         {
-            return type.Implementation
+            return type.Interface
                        .GetCustomAttributes<StreamSubscriptionAttribute>(inherit: true)
                        .Select(a => From(type, a));
         }
@@ -82,6 +82,10 @@ namespace Orleankka.Core.Streams
             if (!filter.EndsWith("()"))
                 throw new InvalidOperationException("Filter string value is missing '()' function designator");
 
+            // TODO: what to do with filter functions?
+            //       should we make IActor a class, perhaps an ActorDeclaration?
+            //       current ActorPrototype => ActorImplementation (on par with ActorInterface) 
+            //       btw, it will automatically solve the problem of multiple inheritance
             var method = GetStaticMethod(filter, type.Implementation);
             if (method == null)
                 throw new InvalidOperationException("Filter function should be a static method");

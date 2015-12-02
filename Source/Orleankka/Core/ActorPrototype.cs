@@ -15,8 +15,16 @@ namespace Orleankka.Core
         readonly Dispatcher dispatcher;
         readonly ActorType type;
 
-        internal static void Register(ActorType type) => cache.Add(type, Define(type));
-        internal static void Reset()                  => cache.Clear();
+        internal static void Register(ActorType type)
+        {
+            if (type.Implementation != null)
+                cache.Add(type, Define(type));
+        }
+
+        internal static void Reset()
+        {
+            cache.Clear();
+        }
 
         internal static ActorPrototype Define(Type type)      => Define(ActorType.From(type));
         internal static ActorPrototype Define(ActorType type) => CreatePrototype(type);

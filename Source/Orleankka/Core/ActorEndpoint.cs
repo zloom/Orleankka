@@ -87,10 +87,10 @@ namespace Orleankka.Core
         {
             var system = ClusterActorSystem.Current;
 
-            var runtime = new ActorRuntime(system, this);
-            actor = Activator.Activate(path, runtime);
-
             var prototype = ActorPrototype.Of(path);
+            var runtime = new ActorRuntime(system, this);
+
+            actor = Activator.Activate(path, runtime);
             actor.Initialize(path.Id, runtime, prototype);
 
             return actor.OnActivate();

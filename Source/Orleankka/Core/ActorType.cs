@@ -69,7 +69,7 @@ namespace Orleankka.Core
                     $"under the code {registered.Code}");
 
             codes.Add(type.Code, type);
-            types.Add(actor, type);
+            types.Add(type.Interface, type);
 
             return type;
         }
@@ -129,10 +129,6 @@ namespace Orleankka.Core
 
         public static ActorType From(Type type)
         {
-            // figure out whether you deal with interface or concrete actor type
-            // and get attributes accordingly, either from type or from it's interface
-            // if it has separated interface of course; otherwise type <==> interface
-
             var @interface = InterfaceOf(type);
             var @implementation = ImplementationOf(type);
             var code = GetTypeCode(@interface);
@@ -142,12 +138,21 @@ namespace Orleankka.Core
 
         static Type InterfaceOf(Type type)
         {
-            return type;
+            if (type.IsInterface)
+                return type;
+
+            var @interface = type
+                .GetInterfaces()
+                .SingleOrDefault(x => 
+                    typeof(IActor).IsAssignableFrom(x) 
+                    && x != typeof(IActor));
+
+            return @interface ?? type;
         }
 
         static Type ImplementationOf(Type type)
         {
-            return type;
+            return type.IsClass ? type : null;
         }
 
         static string GetTypeCode(Type type)
